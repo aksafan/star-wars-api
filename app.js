@@ -1,22 +1,9 @@
-async function getSWPeople(url = 'https://www.swapi.tech/api/people?page=1&limit=10') {
-    return await getData(url);
-}
+renderStarWarsCharachtersPage();
 
-async function getSWPersonById(id) {
-    const url = 'https://www.swapi.tech/api/people/' + id;
-
-    return await getData(url);
-}
-
-async function getData(url) {
-    const response = await fetch(url);
-
-    if (!response.ok) {
-        throw new Error('There was a problem with the fetch operation');
-    }
-    const data = await response.json();
-
-    return data;
+async function renderStarWarsCharachtersPage() {
+    const sWPeopleData = await getSWPeople();
+    await renderStarWarsCharachtersList(sWPeopleData.results);
+    await renderPagination(sWPeopleData.previous, sWPeopleData.next);
 }
 
 async function renderStarWarsCharachtersList(list) {
@@ -26,11 +13,23 @@ async function renderStarWarsCharachtersList(list) {
     await list.forEach(async person => {
         content.innerHTML = content.innerHTML += `<div class="person">
                                                     <h2>${person.name}</h2>
-                                                    <div class="profile" id="${person.uid}">
-                                                    <button onclick="renderProfileInfo(${person.uid});">Open profile</button>
+                                                    <div id="${person.uid}">
+                                                    <button class="show-profile-button" onclick="renderProfileInfo(${person.uid});">Show profile</button>
                                                     </div>
                                                 </div>`;
     });
+}
+
+async function renderPagination(prevLink, nextLink) {
+    let buttons = document.querySelector('.buttons');
+    buttons.innerHTML = "";
+    if (prevLink) {
+        renderPaginationButton("Previous", prevLink);
+    }
+
+    if (nextLink) {
+        renderPaginationButton("Next", nextLink)
+    }
 }
 
 async function renderProfileInfo(id) {
@@ -38,7 +37,7 @@ async function renderProfileInfo(id) {
     let properties = profile.result.properties;
     let profileBlock = document.getElementById(id);
     profileBlock.innerHTML = "";
-    profileBlock.innerHTML = `<div class="profile-data">
+    profileBlock.innerHTML = `<div>
                                 <p>Height: ${properties.height}</p>
                                 <p>Mass: ${properties.mass}</p>
                                 <p>Hair color: ${properties.hair_color}</p>
@@ -54,32 +53,33 @@ async function renderPaginationButton(text, apiUrl) {
     let buttons = document.querySelector('.buttons');
     const button = document.createElement("button");
     button.innerHTML = text;
-    button.className = apiUrl ? "pagination pagination-active" : "pagination";
+    button.className = "pagination";
     button.addEventListener("click", async function () {
-        const SWPeopleData = await getSWPeople(apiUrl);
-        renderStarWarsCharachtersList(SWPeopleData.results);
-        renderPagination(SWPeopleData.previous, SWPeopleData.next);
+        const sWPeopleData = await getSWPeople(apiUrl);
+        renderStarWarsCharachtersList(sWPeopleData.results);
+        renderPagination(sWPeopleData.previous, sWPeopleData.next);
 
     })
     buttons.append(button);
 }
 
-async function renderPagination(prev, next) {
-    let buttons = document.querySelector('.buttons');
-    buttons.innerHTML = "";
-    if (prev) {
-        renderPaginationButton("Previous", prev);
-    }
-
-    if (next) {
-        renderPaginationButton("Next", next)
-    }
+async function getSWPeople(url = 'https://www.swapi.tech/api/people?page=1&limit=10') {
+    return await getData(url);
 }
 
-async function renderStarWarsCharachtersPage() {
-    const SWPeopleData = await getSWPeople();
-    await renderStarWarsCharachtersList(SWPeopleData.results);
-    await renderPagination(SWPeopleData.previous, SWPeopleData.next);
+async function getSWPersonById(id) {
+    const url = `https://www.swapi.tech/api/people/${id}`;
+
+    return await getData(url);
 }
 
-renderStarWarsCharachtersPage();
+async function getData(url) {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error('There was a problem with the fetch operation');
+    }
+    const data = await response.json();
+
+    return data;
+}
