@@ -1,4 +1,37 @@
 .person {
     padding-bottom: 24px;
     border-bottom: 2px solid gray;
+    width: 45%;
+}
+
+.buttons {
+    margin-top: 40px;
+}
+
+.content {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.pagination,
+.show-profile-button {
+    background-color: white;
+    border: 1px solid blue;
+    border-radius: 24px;
+    padding: 8px 16px;
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.6s;
+
+    &:hover {
+        background-color: blue;
+        color: white;
+    }
+}
+
+.pagination {
+    margin-right: 16px;
 }
